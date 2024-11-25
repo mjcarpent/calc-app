@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"testing"
+
+	"github.com/mjcarpent/calc-lib"
 )
 
 func assertError(t *testing.T, err, expected error) {
@@ -24,21 +26,21 @@ func assertOutput(t *testing.T, output string, expected string) {
 
 func TestHandler_NoParameters(t *testing.T) {
 
-	handler := NewHandler(nil, nil)
+	handler := NewCLIHandler(nil, nil)
 	err := handler.Handle(nil)
 	assertError(t, err, insufficientArgs)
 }
 
 func TestHandler_OperandOneBad(t *testing.T) {
 
-	handler := NewHandler(new(bytes.Buffer), &calc.Addition{})
+	handler := NewCLIHandler(new(bytes.Buffer), &calc.Addition{})
 	err := handler.Handle([]string{"a", "2"})
 	assertError(t, err, invalidArg)
 }
 
 func TestHandler_OperandTwoBad(t *testing.T) {
 
-	handler := NewHandler(new(bytes.Buffer), &calc.Addition{})
+	handler := NewCLIHandler(new(bytes.Buffer), &calc.Addition{})
 	err := handler.Handle([]string{"7", "z"})
 	assertError(t, err, invalidArg)
 }
@@ -46,7 +48,7 @@ func TestHandler_OperandTwoBad(t *testing.T) {
 func TestHandler_Success(t *testing.T) {
 
 	buf := new(bytes.Buffer)
-	handler := NewHandler(buf, &calc.Addition{})
+	handler := NewCLIHandler(buf, &calc.Addition{})
 	_ = handler.Handle([]string{"7", "3"})
 	assertOutput(t, buf.String(), "10")
 }
@@ -55,7 +57,7 @@ func TestHandler_BadOutput(t *testing.T) {
 
 	myError := errors.New("splat")
 	output := &WriterError{err: myError}
-	handler := NewHandler(output, &calc.Addition{})
+	handler := NewCLIHandler(output, &calc.Addition{})
 	err := handler.Handle([]string{"7", "5"})
 	assertError(t, err, myError)
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+
+	"github.com/mjcarpent/calc-lib"
 )
 
 type CLIHandler struct {
