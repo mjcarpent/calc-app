@@ -5,19 +5,21 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-
-	"github.com/mjcarpent/calc-lib"
 )
 
-type CLIHandler struct {
-	writer io.Writer
-	calc   *calc.Addition
+type Calculator interface {
+	Calculate(a, b int) int
 }
 
-func NewCLIHandler(stdout io.Writer, calculator *calc.Addition) *CLIHandler {
+type CLIHandler struct {
+	writer     io.Writer
+	calculator Calculator
+}
+
+func NewCLIHandler(stdout io.Writer, calculator Calculator) *CLIHandler {
 	return &CLIHandler{
-		writer: stdout,
-		calc:   calculator,
+		writer:     stdout,
+		calculator: calculator,
 	}
 }
 
@@ -37,7 +39,7 @@ func (this *CLIHandler) Handle(args []string) error {
 		return fmt.Errorf("%w: %w", invalidArg, err)
 	}
 
-	param3 := this.calc.Calculate(param1, param2)
+	param3 := this.calculator.Calculate(param1, param2)
 	_, err = fmt.Fprintf(this.writer, "%d", param3)
 	if err != nil {
 		return err
